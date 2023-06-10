@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7PueQTyC4MCuL39hkQdrHqXmrTm60",
+  "object": "chat.completion",
+  "created": 1686410322,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 2560,
+    "completion_tokens": 78,
+    "total_tokens": 2638
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Function names:\n- create_log_file\n- save_request_as_humanreadable_text\n- save_response_as_humanreadable_text\n- pretty_print_json\n- save_json_log\n- save_file\n- open_file\n- get_response\n- handle_error\n- do_chatbot_conversation_exchange\n- multi_line_input\n- get_user_input\n- print_chatbot_response\n- main"
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

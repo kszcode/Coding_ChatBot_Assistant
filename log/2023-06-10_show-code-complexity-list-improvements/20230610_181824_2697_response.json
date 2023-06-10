@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7PudgDpwoRsakQoCzua4IDxyykZ6T",
+  "object": "chat.completion",
+  "created": 1686410276,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 2558,
+    "completion_tokens": 139,
+    "total_tokens": 2697
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "For the Python code, the function names are:\n\n1. create_log_file\n2. save_request_as_humanreadable_text\n3. save_response_as_humanreadable_text\n4. pretty_print_json\n5. save_json_log\n6. save_file\n7. open_file\n8. get_response\n9. handle_error\n10. do_chatbot_conversation_exchange\n11. multi_line_input\n12. get_user_input\n13. print_chatbot_response\n14. main\n\nFor the markdown file (README.md), the headings are:\n\n1. Coding Chatbot with Scratchpad\n2. Features\n3. Setup\n4. Setup using virtual environment\n5. Usage"
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

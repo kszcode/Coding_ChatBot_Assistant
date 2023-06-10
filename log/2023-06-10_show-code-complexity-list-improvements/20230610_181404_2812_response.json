@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7PuZS1kVm8Fp43g6KJObuMtMk5u29",
+  "object": "chat.completion",
+  "created": 1686410014,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 2589,
+    "completion_tokens": 223,
+    "total_tokens": 2812
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "1. Bugs:\n- In the `AppState` class, `self.MODEL_MAX_TOKENS` is set to 7500, which is too high for any GPT model. You should set it to a lower value, like 2048 for gpt-3.5-turbo.\n- In the `main()` function, the system message is read from 'system_message.txt', but in the README, it's mentioned as 'scratchpad.txt'. You should update the README to match the code.\n\n2. Low hanging fruits for improvement:\n- You can add a function to validate the user input for model name and temperature to ensure they are within the acceptable range.\n- You can add a function to load the API key from an environment variable instead of a file, which is a more secure way to handle API keys.\n\n3. Improvements that would require a lot of work:\n- Implementing a more sophisticated error handling mechanism for API communication.\n- Adding support for other chatbot models and APIs.\n- Creating a graphical user interface (GUI) for the chatbot to make it more user-friendly."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

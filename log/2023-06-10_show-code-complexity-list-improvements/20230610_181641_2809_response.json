@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7PubvZ0RgbGp1QBeFXgegLD158A5h",
+  "object": "chat.completion",
+  "created": 1686410167,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 2589,
+    "completion_tokens": 220,
+    "total_tokens": 2809
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "1. Bugs:\n- There is a reference to the GPT-4 model in the AppState class, but GPT-4 does not exist. You should change it to \"gpt-3.5-turbo\" or another available model.\n\n2. Low hanging fruits for improvement:\n- In the `main()` function, you can add a command-line argument for the max tokens instead of using the hardcoded value in the AppState class.\n- You can add error handling for when the `key_openai.txt` file is missing or empty.\n- You can add a function to clear the conversation history if the user wants to start a new conversation without exiting the script.\n\n3. Improvements that would require a lot of work:\n- Implement a more sophisticated method for handling long conversations that exceed the model's token limit, such as intelligently summarizing or truncating the conversation.\n- Add a graphical user interface (GUI) for a more user-friendly experience.\n- Implement a feature to save and load conversation history, allowing users to continue previous conversations.\n- Add support for other languages and models."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

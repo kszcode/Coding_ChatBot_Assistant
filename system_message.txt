@@ -10,6 +10,4 @@ Use your best judgment to discern if the user is asking for you to modify the be
 or if the code is there for reference.
 
 Coding scratchpad:
-```python
 <<CODE>>
-```

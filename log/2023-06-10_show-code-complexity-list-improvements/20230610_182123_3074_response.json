@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7PugfRVEDJtL3xDAfVS4BF7u2wilo",
+  "object": "chat.completion",
+  "created": 1686410461,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 2750,
+    "completion_tokens": 324,
+    "total_tokens": 3074
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Here is a table with the function names, called from, and calls functions:\n\n| Function Name | Called From | Calls Functions |\n| --- | --- | --- |\n| create_log_file | save_request_as_humanreadable_text, save_response_as_humanreadable_text | None |\n| save_request_as_humanreadable_text | do_chatbot_conversation_exchange | create_log_file, save_file |\n| save_response_as_humanreadable_text | do_chatbot_conversation_exchange | create_log_file, pretty_print_json, save_file |\n| pretty_print_json | save_response_as_humanreadable_text | None |\n| save_json_log | do_chatbot_conversation_exchange | pretty_print_json, create_log_file, save_file |\n| save_file | save_request_as_humanreadable_text, save_response_as_humanreadable_text, save_json_log | None |\n| open_file | get_response, handle_error, do_chatbot_conversation_exchange, main | None |\n| get_response | do_chatbot_conversation_exchange | openai.ChatCompletion.create |\n| handle_error | do_chatbot_conversation_exchange | None |\n| do_chatbot_conversation_exchange | main | save_json_log, save_request_as_humanreadable_text, get_response, save_response_as_humanreadable_text, handle_error |\n| multi_line_input | get_user_input | None |\n| get_user_input | main | multi_line_input |\n| print_chatbot_response | main | None |\n| main | None | openai.api_key, argparse.ArgumentParser, get_user_input, save_file, open_file, do_chatbot_conversation_exchange, print_chatbot_response |"
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

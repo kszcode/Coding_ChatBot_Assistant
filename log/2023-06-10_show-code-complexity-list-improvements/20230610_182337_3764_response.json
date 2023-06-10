@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7PuibzAUYFcmJGlv7Rfdq8OAJjxf0",
+  "object": "chat.completion",
+  "created": 1686410581,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 3117,
+    "completion_tokens": 647,
+    "total_tokens": 3764
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Here is the updated table with the function names, called from, calls functions, and function complexity:\n\n| Function Name | Called From | Calls Functions | Function Complexity | Evaluation |\n| --- | --- | --- | --- | --- |\n| create_log_file | save_request_as_humanreadable_text, save_response_as_humanreadable_text | None | 2 | This function has a low complexity as it simply creates a log file with a timestamp and suffix. |\n| save_request_as_humanreadable_text | do_chatbot_conversation_exchange | create_log_file, save_file | 5 | This function has a moderate complexity as it saves the conversation as human-readable text, and calls two other functions. |\n| save_response_as_humanreadable_text | do_chatbot_conversation_exchange | create_log_file, pretty_print_json, save_file | 6 | This function has a moderate complexity as it saves the response as human-readable text, and calls three other functions. |\n| pretty_print_json | save_response_as_humanreadable_text | None | 2 | This function has a low complexity as it simply pretty prints JSON. |\n| save_json_log | do_chatbot_conversation_exchange | pretty_print_json, create_log_file, save_file | 6 | This function has a moderate complexity as it saves the conversation as JSON, and calls three other functions. |\n| save_file | save_request_as_humanreadable_text, save_response_as_humanreadable_text, save_json_log | None | 2 | This function has a low complexity as it simply saves a file. |\n| open_file | get_response, handle_error, do_chatbot_conversation_exchange, main | None | 2 | This function has a low complexity as it simply opens a file. |\n| get_response | do_chatbot_conversation_exchange | openai.ChatCompletion.create | 5 | This function has a moderate complexity as it gets a response from OpenAI's API, and calls one other function. |\n| handle_error | do_chatbot_conversation_exchange | None | 2 | This function has a low complexity as it simply handles errors. |\n| do_chatbot_conversation_exchange | main | save_json_log, save_request_as_humanreadable_text, get_response, save_response_as_humanreadable_text, handle_error | 8 | This function has a high complexity as it performs the main chatbot conversation exchange, and calls five other functions. |\n| multi_line_input | get_user_input | None | 2 | This function has a low complexity as it simply gets multi-line input from the user. |\n| get_user_input | main | multi_line_input | 3 | This function has a low to moderate complexity as it gets user input and calls one other function. |\n| print_chatbot_response | main | None | 2 | This function has a low complexity as it simply prints the chatbot response. |\n| main | None | openai.api_key, argparse.ArgumentParser, get_user_input, save_file, open_file, do_chatbot_conversation_exchange, print_chatbot_response | 9 | This function has a high complexity as it is the main function that runs the chatbot, and calls seven other functions. |"
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}
