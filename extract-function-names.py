@@ -1,0 +1,31 @@
+import os
+import ast
+import json
+
+
+def get_functions(file_path):
+    with open(file_path, "r") as source_code:
+        tree = ast.parse(source_code.read())
+        functions = [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
+    return functions
+
+
+def scan_directory(path):
+    directory_data = {}
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if file.endswith('.py'):
+                file_path = os.path.join(root, file)
+                directory_data[file_path] = get_functions(file_path)
+    return directory_data
+
+
+def main():
+    folder_name = "/Users/km1/2code/python-projects/Coding_ChatBot_Assistant/"
+    data = scan_directory(folder_name)
+    with open('output.json', 'w') as json_file:
+        json.dump(data, json_file, indent=4)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7PzqYFTKbQrzROtH4rLtTLvBFAxZp",
+  "object": "chat.completion",
+  "created": 1686430294,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 727,
+    "completion_tokens": 294,
+    "total_tokens": 1021
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "```python\nimport os\nimport ast\nimport json\n\n\ndef get_functions(file_path):\n    with open(file_path, \"r\") as source_code:\n        tree = ast.parse(source_code.read())\n        functions = [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]\n    return functions\n\n\ndef scan_directory(path):\n    directory_data = {}\n    for root, dirs, files in os.walk(path):\n        for file in files:\n            if file.endswith('.py'):\n                file_path = os.path.join(root, file)\n                relative_path = os.path.relpath(file_path, path)\n                directory_data[relative_path] = get_functions(file_path)\n    return directory_data\n\n\ndef main():\n    folder_name = \"/Users/km1/2code/python-projects/Coding_ChatBot_Assistant/\"\n    data = scan_directory(folder_name)\n    final_data = {folder_name: data}\n    with open('output.json', 'w') as json_file:\n        json.dump(final_data, json_file, indent=4)\n\n\nif __name__ == \"__main__\":\n    main()\n```\nThis updated code will generate the expected JSON format. The main change is in the `scan_directory` function, where I added a line to calculate the relative path of the file with respect to the given folder path. Then, in the `main` function, I wrapped the scanned data in a dictionary with the folder name as the key."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}
