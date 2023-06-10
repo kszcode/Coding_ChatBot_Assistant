@@ -24,7 +24,7 @@ def scan_directory(path):
 
 
 def main():
-    folder_name = "/Users/km1/2code/python-projects/Coding_ChatBot_Assistant/"
+    folder_name = os.getcwd()
     data = scan_directory(folder_name)
     with open('output.json', 'w') as json_file:
         json.dump(data, json_file, indent=4)
