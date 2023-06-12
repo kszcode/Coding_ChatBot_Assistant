@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7Qet6ZND8q33eBV2CoC2UqVylXchD",
+  "object": "chat.completion",
+  "created": 1686588056,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 2190,
+    "completion_tokens": 443,
+    "total_tokens": 2633
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "To update the code to take the `--topic` argument and make sure the topic folder is relative to the current working folder, you can modify the `main()` function and the `AppState` class as follows:\n\n```python\nclass AppState:\n    def __init__(self):\n        self.MODEL_NAME = \"gpt-4\"\n        self.MODEL_TEMPERATURE = 0.1\n        self.MODEL_MAX_TOKENS = 7500\n        self.USER_MESSAGE_FILE = 'user-message.md'\n        self.SYSTEM_MESSAGE_FILE = 'system-message.md'\n        self.SCRATCH_PAD_FILE = 'scratch-pad.md'\n        self.TOPIC_FOLDER = '1-change-topic-base-folder-python'\n        self.ALL_MESSAGES = list()\n\n    def for_topic_get(self, relative_path):\n        return os.path.join(f'topics/{self.TOPIC_FOLDER}/{relative_path}')\n\n\n# ...\n\n\ndef main():\n    # instantiate chatbot\n    openai.api_key = read_file_content('key_openai.txt').strip()\n\n    # parse arguments\n    parser = argparse.ArgumentParser(description=\"Chatbot using OpenAI API\")\n    parser.add_argument(\"--model\", default=app_state.MODEL_NAME,\n                        help=\"Model name (default: %(default)s)\")\n    parser.add_argument(\"--temperature\", type=float, default=app_state.MODEL_TEMPERATURE,\n                        help=\"Temperature (default: %(default)s)\")\n    parser.add_argument(\"--user-message\", type=str, default=app_state.MODEL_TEMPERATURE,\n                        help=\"Temperature (default: %(default)s)\")\n    parser.add_argument(\"--topic\", type=str, default=app_state.TOPIC_FOLDER,\n                        help=\"Topic folder (default: %(default)s)\")\n    args, unknown = parser.parse_known_args()\n\n    app_state.MODEL_NAME = args.model\n    app_state.MODEL_TEMPERATURE = args.temperature\n    app_state.TOPIC_FOLDER = args.topic\n\n    # ...\n\n\nif __name__ == '__main__':\n    main()\n```\n\nNow, the code will accept the `--topic` argument and set the `TOPIC_FOLDER` accordingly. The `for_topic_get` method in the `AppState` class has been updated to make the topic folder relative to the current working folder."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

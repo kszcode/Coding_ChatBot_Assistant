@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QenovmcyDTR3jF5bdcbN8UWHuE9p",
+  "object": "chat.completion",
+  "created": 1686587728,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 2218,
+    "completion_tokens": 568,
+    "total_tokens": 2786
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Here's the updated code that allows you to provide an argument with `--topic` to the main script. The value of it will look up a folder in the `<current-folder>/topic` and from there it will load the `scratchpad.md`, `user_message.md`, and `system_message.md`.\n\n```python\nimport argparse\nimport json\nimport os\nimport textwrap\nimport time\nfrom datetime import datetime\nfrom typing import Any, Union\nfrom typing import List\n\nimport openai\n\n\nclass AppState:\n    def __init__(self):\n        self.MODEL_NAME = \"gpt-4\"\n        self.MODEL_TEMPERATURE = 0.1\n        self.MODEL_MAX_TOKENS = 7500\n        self.USER_MESSAGE_FILE = 'user-message.md'\n        self.SYSTEM_MESSAGE_FILE = 'system-message.md'\n        self.SCRATCH_PAD_FILE = 'scratch-pad.md'\n        self.TOPIC_FOLDER = '1-change-topic-base-folder-python'\n        self.ALL_MESSAGES = list()\n\n    def for_topic_get(self, relative_path):\n        return os.path.join('topics/{}/{}'.format(self.TOPIC_FOLDER, relative_path))\n\n\napp_state = AppState()\n\n# ... (rest of the code remains the same)\n\ndef main():\n    # instantiate chatbot\n    openai.api_key = read_file_content('key_openai.txt').strip()\n\n    # parse arguments\n    parser = argparse.ArgumentParser(description=\"Chatbot using OpenAI API\")\n    parser.add_argument(\"--model\", default=app_state.MODEL_NAME,\n                        help=\"Model name (default: %(default)s)\")\n    parser.add_argument(\"--temperature\", type=float, default=app_state.MODEL_TEMPERATURE,\n                        help=\"Temperature (default: %(default)s)\")\n    parser.add_argument(\"--topic\", type=str, default=app_state.TOPIC_FOLDER,\n                        help=\"Topic folder (default: %(default)s)\")\n    args, unknown = parser.parse_known_args()\n\n    app_state.MODEL_NAME = args.model\n    app_state.MODEL_TEMPERATURE = args.temperature\n    app_state.TOPIC_FOLDER = args.topic\n\n    print(f\"Current settings:\\n\"\n          f\"Model: {app_state.MODEL_NAME}\\n\"\n          f\"Temperature: {app_state.MODEL_TEMPERATURE}\\n\"\n          f\"Topic: {app_state.TOPIC_FOLDER}\")\n    print(\"Sample app usage: python chat.py --model gpt-3.5-turbo --temperature 0.2 --topic my-topic-folder\")\n\n    # ... (rest of the code remains the same)\n\nif __name__ == '__main__':\n    main()\n```\n\nNow you can provide the `--topic` argument when running the script, like this:\n\n```bash\npython chat.py --model gpt-3.5-turbo --temperature 0.2 --topic my-topic-folder\n```"
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

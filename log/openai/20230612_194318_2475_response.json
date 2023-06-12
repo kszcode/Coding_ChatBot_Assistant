@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QeuuqUMLsVsomOvjFt52xu9StRLF",
+  "object": "chat.completion",
+  "created": 1686588168,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 2239,
+    "completion_tokens": 236,
+    "total_tokens": 2475
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "To update the code to make the topic folder relative to the current working folder and log the response in the topic folder, you can modify the `AppState` class and the `save_response_as_human_readable_text` function as follows:\n\n```python\nclass AppState:\n    def __init__(self):\n        # ...\n        self.TOPIC_FOLDER = os.path.join(os.getcwd(), '1-change-topic-base-folder-python')\n        # ...\n\n    def for_topic_get(self, relative_path):\n        return os.path.join(self.TOPIC_FOLDER, relative_path)\n\n\n# ...\n\n\ndef save_response_as_human_readable_text(response, total_tokens, duration, suffix=\"\"):\n    log_dir = app_state.for_topic_get(\"log/openai\")\n    if not os.path.exists(log_dir):\n        os.makedirs(log_dir)\n    timestamp = datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n    log_file = os.path.join(log_dir, f\"{timestamp}{suffix}\")\n    # ...\n```\n\nNow, the `TOPIC_FOLDER` attribute in the `AppState` class is set to the current working folder, and the `save_response_as_human_readable_text` function saves the response in the topic folder."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}
