@@ -1,0 +1,82 @@
+
+/**
+ * Communicate with user that they already have a subscription
+ * @param {string} subscription_type
+ */
+function handleExistingSubscription(subscription_type: number) {
+
+    $('#customer-name-container').slideUp();
+
+    $('#payment-stripe').slideUp();
+    $('#payment-using-hosted-field-integration').slideUp();
+    $('.cb-main-footer').slideUp();
+    logThisState("handleExistingSubscription: subscription_type", subscription_type);
+    logThisState("handleExistingSubscription: cpState.isLoggedIn", cpState.isLoggedIn);
+    if (digital_prod_id.includes(subscription_type)) {
+        $('#checkout-form .loading-throbber-wrapper').hide();
+        if (cpState.isLoggedIn) {
+
+            $('#existing-sub').slideDown();
+            $('.read-footer').slideDown();
+            logThisState("handleExistingSubscription: show you have an existing subscription and you are logged in");
+        } else {
+            $('#existing-sub-logged-out').slideDown();
+            const MSG_SHOW_EXISTING_SUBSCRIPTION_NOT_LOGGED_IN = "handleExistingSubscription: show you have an existing subscription and you are NOT logged in";
+            logThisState(MSG_SHOW_EXISTING_SUBSCRIPTION_NOT_LOGGED_IN);
+        }
+    }
+    $('#resetpw').on('click',
+        async function (e) {
+            e.preventDefault();
+            const checkoutData = cpState.checkoutData;
+            const customerData = cpState.customerData;
+            const email = (checkoutData.customer && checkoutData.customer.email) || customerData.email;
+            await subscriptionAPIs.requestResetPassword(email);
+            $('#reset-success').slideDown();
+        }
+    );
+    $('#go-to-eet').on('click',
+        function (e) {
+            e.preventDefault();
+            window.location.href = "https://theepochtimes.com";
+        }
+    );
+}
+function getMoneyString(amountInCents: number) {
+    if (amountInCents % 100 > 0) {
+        return (amountInCents / 100).toFixed(2);
+    } else {
+        return (amountInCents / 100).toString();
+    }
+}
+function isStripePaymentSelected() {
+    let gatewayFound = 2;
+    if (cpState &&
+        cpState.offerDetail &&
+        cpState.offerDetail.offer_detail &&
+        cpState.offerDetail.offer_detail.plan &&
+        cpState.offerDetail.offer_detail.plan.product &&
+        cpState.offerDetail.offer_detail.plan.product.default_gateway
+    ) {
+        gatewayFound = cpState.offerDetail.offer_detail.plan.product.default_gateway;
+        logThisState("isStripePaymentSelected: gatewayFound --- Btest: ", gatewayFound);
+    } else {
+        logError("Could not read gatewayFound --- Btest ", cpState.offerDetail.offer_detail.plan.product.default_gateway);
+    }
+    const stripeFound = ((gatewayFound == 2) || (gatewayFound == 3))
+    logThisState("isStripePaymentSelected: stripeFound: ", stripeFound);
+    logThisState("isStripePaymentSelected: gatewayFound: ", gatewayFound);
+    return stripeFound;
+}
+function getLocalizedText(lang: string, messageKey: string): string {
+    if (localizedMessages[lang] && localizedMessages[lang][messageKey]) {
+        return localizedMessages[lang][messageKey];
+    } else {
+        console.warn(`The key "${messageKey}" does not exist in the language "${lang}"`);
+        return '';
+    }
+}
+function outputLocalizedText(selector: string, messageKey: string, lang: string = currentLanguage): void {
+    $(selector).text(getLocalizedText(lang, messageKey));
+}
+

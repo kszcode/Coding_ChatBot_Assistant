@@ -1,0 +1,369 @@
+
+
+window.UpgradeOffer = {
+    start: function () {
+        const forceOnboarding = true;
+        if (forceOnboarding) {
+            this.startOnboarding();
+            return;
+        }
+        let subs_id = false;
+        if (cpState.newSubData && cpState.newSubData.subscription_key) {
+            subs_id = cpState.newSubData.subscription_key;
+        } else if (cpState.existingSubData && cpState.existingSubData.subscription_key) {
+            subs_id = cpState.existingSubData.subscription_key;
+        }
+        if ((cpState.selectedPlanDescription.planType === "video" || cpState.selectedPlanDescription.planType === "digital")
+            && cpState.selectedPlanDescription.planPeriodUnit !== "year" && subs_id) {
+            window.addEventListener("message", function (message) {
+                try {
+                    let data = JSON.parse(message.data);
+                    if (data.module === "CHECKOUT" && data.action === "REDIRECT") {
+                        continueReadingRedirect();
+                    }
+                } catch (e) {
+                }
+            }, false);
+            let upgradeTemplateId = "e1d7892d-5878-41e3-9c21-fd856153f027";
+            if (cpState.selectedPlanDescription.planType === "video") {
+                upgradeTemplateId = "e8fa5618-82f9-4954-a3dc-65b845873e54";
+            }
+            $('.thankyou-simple').remove();
+            window.parent.postMessage(JSON.stringify({
+                module: "GENERAL",
+                action: "POPUP",
+                data: {
+                    width: "800px",
+                    height: "650px",
+                    hideCloseBtn: true,
+                    template: {
+                        id: upgradeTemplateId,
+                        data: {
+                            subscription_key: subs_id,
+                            sourceTemplate: window.checkoutEngineVersion,
+                            originalPlan: cpState.selectedPlanDescription.planId
+                        }
+                    },
+                }
+            }), "*");
+
+        } else {
+            continueReadingRedirect();
+            return;
+        }
+    },
+    startOnboarding: function (subs_id: string) {
+
+        if (cpState.newSubData && cpState.newSubData.subscription_key) {
+            subs_id = cpState.newSubData.subscription_key;
+        } else if (cpState.existingSubData && cpState.existingSubData.subscription_key) {
+            subs_id = cpState.existingSubData.subscription_key;
+        } else {
+            subs_id = subs_id ? subs_id : '';
+        }
+        let subs_email = (cpState.checkoutData.customer && cpState.checkoutData.customer.email) || cpState.customerData.email;
+
+
+        if (cpState.selectedPlanDescription.planType === "video" && cpState.selectedPlanDescription.planPeriodUnit !== "year" && subs_id) {
+            window.addEventListener("message", function (message) {
+                try {
+                    let data = JSON.parse(message.data);
+                    if (data.module === "CHECKOUT" && data.action === "REDIRECT") {
+                        continueReadingRedirect();
+                    }
+                } catch (e) {
+                }
+            }, false);
+            $('.thankyou-simple').remove();
+            window.parent.postMessage(JSON.stringify({
+                module: "GENERAL",
+                action: "POPUP",
+                data: {
+                    width: "800px",
+                    height: "650px",
+                    hideCloseBtn: true,
+                    template: {
+                        id: "e8fa5618-82f9-4954-a3dc-65b845873e54",
+                        data: {
+                            subscription_key: subs_id,
+                            sourceTemplate: window.checkoutEngineVersion,
+                            originalPlan: cpState.selectedPlanDescription.planId
+                        }
+                    },
+                }
+            }), "*");
+        } else if (cpState.selectedPlanDescription.planType === "digital" && subs_id) {
+
+            window.addEventListener("message", function (message) {
+                try {
+                    let data = JSON.parse(message.data);
+                    if (data.module === "CHECKOUT" && data.action === "REDIRECT") {
+
+                        continueReadingRedirect();
+                    }
+                } catch (e) {
+                    console.error("startOnboarding: event listener error L1635", e);
+                }
+            }, false);
+
+            let templateParameters = {
+                subscription_key: subs_id,
+                sourceTemplate: window.checkoutEngineVersion,
+                originalPlan: cpState.selectedPlanDescription.planId,
+                offerAnnualUpgrade: false,
+                userEmail: subs_email,
+                defaultLists: "XvIFJS6Zcw",
+                digital: true,
+                planType: cpState.selectedPlanDescription.planType,
+            };
+            window.epSubs.showTemplate("80158ba8-d2f1-4dec-834b-0b8c7f694fd0", 'POPUP', {
+                height: "100%",
+                width: "100%",
+                hideCloseBtn: true,
+                version: 1
+            }, templateParameters);
+        } else {
+                cpState.selectedPlanDescription.planType,
+                " subs_id: ", subs_id);
+            window.addEventListener("message", function (message) {
+            });
+            continueReadingRedirect();
+            return;
+        }
+    }
+}
+async function getEmailSecureToken(email: string) {
+    return $.ajax({
+        method: 'GET',
+        url: 'https://subsapi.epoch.cloud/get_email_secure_token?days_expire=30&email=' + encodeURIComponent(email),
+        dataType: 'json'
+    });
+}
+function trackReferralInfo() {
+    try {
+        let st = window.epSubs.getAllUrlParams(window.epSubs.getAllUrlParams().pl).st;
+        if (st && cpState.checkoutData && cpState.checkoutData.customer && cpState.checkoutData.customer.email) {
+            $.ajax({
+                url: 'https://subsapi.epoch.cloud/referral/accept?referral_type=digital&share_token=' + encodeURIComponent(st) + '&email=' + encodeURIComponent(cpState.checkoutData.customer.email),
+                dataType: 'json',
+                method: 'GET',
+            })
+        }
+    } catch (e) {
+    }
+}
+export const subscriptionAPIs = {
+    conductorHostUrl: window.configConductorUrl,
+    userHostUrl: window.configUserHostUrl,
+    siteID: window.configSiteID,
+
+    registerUser: async function (data: any) {
+        return $.ajax({
+            type: "POST",
+            url: this.userHostUrl + "registration?site=" + this.siteID,
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (res) {
+                ga('send', 'event', 'Digital Checkout Page', 'Create user success', JSON.stringify(res));
+            },
+            error: function (res) {
+                ga('send', 'event', 'Digital Checkout Page', 'Create user failure', JSON.stringify(res));
+            }
+        });
+    },
+    getUserInformation: async function () {
+        let url = this.userHostUrl + "info?token=" + cpState.customerData.token;
+        return $.ajax({
+            type: "GET",
+            url: url,
+            success: function (res) {
+                ga('send', 'event', 'Digital Checkout Page', 'Get user information success', JSON.stringify(res));
+            },
+            error: function (res) {
+                ga('send', 'event', 'Digital Checkout Page', 'Get user information failure', JSON.stringify(res));
+            }
+        });
+    },
+    getPaymentMethod: async function () {
+        let urlListCards = this.conductorHostUrl + "list_card?token=" + cpState.customerData.token
+            + "&customer_id=" + cpState.customerData.customer_id
+            + "&site_id=" + this.siteID;
+        logThisState("getPaymentMethod: urlListCards=", urlListCards);
+        return $.ajax({
+            type: "GET",
+            url: urlListCards,
+            contentType: 'application/json',
+            dataType: "json",
+            success: function (res) {
+                logThisState("getPaymentMethod: Get payment list success!", JSON.stringify(res));
+                ga('send', 'event', 'Digital Checkout Page', 'Get payment information success', JSON.stringify(res));
+            },
+            error: function (res) {
+                $('#payment-card .edit-subs-btn').hide();
+                ga('send', 'event', 'Digital Checkout Page', 'Get payment information failure', JSON.stringify(res));
+            }
+        });
+    },
+    getPlanDetails: function (plan_id: string) {
+        return $.ajax({
+            url: `${this.conductorHostUrl}retrieve_plan?siteid=${this.siteID}&planid=${plan_id}`,
+            method: "GET",
+            contentType: 'application/json',
+            dataType: "json",
+            success: function (res) {
+                if (res.status === 'ok') {
+                    ga('send', 'event', 'Digital Checkout Page', 'Get plan information success', JSON.stringify(res));
+                    return res.data;
+                }
+            },
+            error: function (res) {
+                ga('send', 'event', 'Digital Checkout Page', 'Get plan information failure', JSON.stringify(res));
+                $('#purchase-btn').attr('disabled', 'disabled');
+            }
+        });
+    },
+
+    getPlanDescription: function (plan_id: string) {
+        return $.ajax({
+            url: 'https://subscribe.theepochtimes.com/api/productdescription.php?plan_id=' + plan_id,
+            method: "GET",
+            contentType: 'application/json',
+            dataType: "json",
+            success: function (res) {
+                return res;
+            },
+            error: function (res) {
+                return {}
+            }
+        })
+    },
+    getExistingSubsInfo: async function (email: string) {
+        const url = `${this.conductorHostUrl}get_subsid?email=${encodeURIComponent(email)}&site_id=${this.siteID}`;
+        return $.ajax({
+            url: url,
+            method: "GET",
+            contentType: 'application/json',
+            dataType: "json",
+            success: function (response) {
+            },
+            error: function (response) {
+                console.error("getExistingSubsInfo: url=", url);
+                console.error("getExistingSubsInfo: response=", response);
+            }
+        });
+    },
+    changePassword: function (data: any, newUserToken: string) {
+        return $.ajax({
+            type: "POST",
+            url: window.configUserHostUrl + `changepassword?token=${encodeURIComponent(newUserToken)}&site_id=${this.siteID}`,
+            data: data,
+            dataType: "json",
+            success: function (res) {
+                if (res.status === "ok") {
+                    ga('send', 'event', 'Digital Checkout Page', 'Successful password update', cpState.customerData.userid);
+                } else {
+                    ga('send', 'event', 'Digital Checkout Page', 'Unsuccessful password update', cpState.customerData.userid + ', error: ' + res);
+                }
+            },
+            error: function (res) {
+                ga('send', 'event', 'Digital Checkout Page', 'Unsuccessful password update', cpState.customerData.userid + ', error: ' + res);
+            }
+        });
+    },
+    requestResetPassword: function (email: string) {
+        const reseturl = 'https://www.theepochtimes.com?pipa_reset_password=';
+        return $.ajax({
+            url: `${this.userHostUrl}resetpassword?site=${this.siteID}&email=${encodeURIComponent(email)}&reseturl=${reseturl}`,
+            method: "POST",
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (res) {
+            },
+            error: function (error) {
+            }
+        })
+    },
+    createSubscriptionUsingOfferAndCreditCard: function (recaptchaToken: string) {
+        logThisState("createSubscriptionUsingOfferAndCreditCard: cpState.checkoutData=", cpState.checkoutData);
+
+        const injectionValue = $.cookie('test-sample-injection');
+        const injectionParameter = injectionValue ? `&injectionCommand=${injectionValue}` : '';
+        const hostNameFor3DS = window.location.hostname;
+
+        let apiUrl = `${this.conductorHostUrl}create_subscription_using_offer`;
+        apiUrl += `?site_id=${this.siteID}`;
+        apiUrl += `&hostNameFor3DS=${hostNameFor3DS}`;
+        apiUrl += `${injectionParameter}`;
+        apiUrl += `&recaptcha=${recaptchaToken}`;
+        logThisState("createSubscriptionUsingOfferAndCreditCard: apiUrl=", apiUrl);
+        return $.ajax({
+            url: apiUrl,
+            method: "POST",
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify(cpState.checkoutData),
+            success: function (res) {
+                if (res.status === 'ok') {
+                    ga('send', 'event', 'Digital Checkout Page', 'SUCCESS - purchaseSubscription');
+                } else {
+                    try {
+                        window.epSubs.trackDataEvent({
+                            "abtest_id": ($ as any).cookie('digital_subscription_tracking_abtest_id') || "",
+                            "user_id": ($ as any).cookie('epoch_user_id'),
+                            "category": 'ERROR Digital Subscription Checkout',
+                            "action": 'createSubscriptionUsingOfferAndCreditCard status != ok',
+                            "label": '',
+                            "src_cat": window.epCheckoutParams.src_cat,
+                            "src_tmp": window.epCheckoutParams.src_tmp,
+                            "src_url": window.epCheckoutParams.src_url,
+                            "src_cmp": window.epCheckoutParams.src_cmp,
+                            "value": '',
+                            metadata: window.checkoutEngineVersion,
+                            "page": window.location.href,
+                            "canonical_url": window.epCheckoutParams.src_url,
+                            "real_url": window.epCheckoutParams.src_url,
+                            "json_data": JSON.stringify({
+                                params: window.epCheckoutParams,
+                                checkoutEngineVersion: window.checkoutEngineVersion,
+                                response: res,
+                                checkoutData: cpState.checkoutData
+                            })
+                        });
+                    } catch (e) {
+                    }
+                }
+            },
+            error: function (res) {
+                ga('send', 'event', 'Digital Checkout Page', 'ERROR - purchaseSubscription');
+                try {
+                    window.epSubs.trackDataEvent({
+                        "abtest_id": ($ as any).cookie('digital_subscription_tracking_abtest_id') || "",
+                        "user_id": ($ as any).cookie('epoch_user_id'),
+                        "category": 'ERROR Digital Subscription Checkout',
+                        "action": 'createSubscriptionUsingOfferAndCreditCard error response',
+                        "label": '',
+                        "src_cat": window.epCheckoutParams.src_cat,
+                        "src_tmp": window.epCheckoutParams.src_tmp,
+                        "src_url": window.epCheckoutParams.src_url,
+                        "src_cmp": window.epCheckoutParams.src_cmp,
+                        "value": '',
+                        metadata: window.checkoutEngineVersion,
+                        "page": window.location.href,
+                        "canonical_url": window.epCheckoutParams.src_url,
+                        "real_url": window.epCheckoutParams.src_url,
+                        "json_data": JSON.stringify({
+                            params: window.epCheckoutParams,
+                            checkoutEngineVersion: window.checkoutEngineVersion,
+                            response: res,
+                            checkoutData: cpState.checkoutData
+                        })
+                    });
+                } catch (e) {
+                }
+            }
+        });
+    },
+
+//

@@ -1,12 +1,11 @@
 - `SYSTEM_MESSAGE_FILE`: system-message-javascript-assistant.txt
 - `SCRATCH_PAD_FILE`: appLogic.ts
 - `SCRATCH_PAD_SPLIT_TEXT`: sfh-split-file-here
-- `SCRATCH_PAD_SPLIT_INDEX`: 0
+- `SCRATCH_PAD_SPLIT_INDEX`: 9
 - `TOPIC_FOLDER`:
+- `MODEL_NAME`: gpt-3.5-turbo
 - `MODEL_TEMPERATURE`: 0.2 
 - `user_message`: 
-
-- [//]: # (- `MODEL_NAME`: gpt-4)
 
 I want this script to prompt the user with German language.
 Find all relevant texts.
@@ -16,9 +15,8 @@ $email.after(`<label id="email-error" class="error" for="email">Please enter a v
 
 This is one of the instructions that I want you to extract.
 
-As a negative example consider:
-logThisState("inlineCP:submitHandler: startCheckout");
-this is a negative example because this is only for logging and logging is OK to be in English.
+Please exclude the following functions: logThisState(), outputLocalizedText(), ga(), window.epSubs.track*()
+these are negative examples because they are used for logging which is OK to be in English.
 
 Now please extract all instructions that could show the user english text.
 

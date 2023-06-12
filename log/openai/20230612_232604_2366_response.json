@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QiOz5D5TqnHp31JLTSgptSI2VHMf",
+  "object": "chat.completion",
+  "created": 1686601565,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 2351,
+    "completion_tokens": 15,
+    "total_tokens": 2366
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "There are no instructions that show the user English text in the provided code."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

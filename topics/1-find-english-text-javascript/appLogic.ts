@@ -309,7 +309,7 @@ export async function setCustomerDetails() {
         ga('send', 'event', 'Digital Checkout Page', 'ERROR get user information', JSON.stringify(error));
     }
 }
-
+//sfh-split-file-here
 /**
  * Check if there is valid subscription
  * - if there is and it's digital, then show and exit

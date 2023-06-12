@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QiGXwylBJVuAXq3dvrWPWdjzgze9",
+  "object": "chat.completion",
+  "created": 1686601041,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 1417,
+    "completion_tokens": 97,
+    "total_tokens": 1514
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Instructions that could show the user English text:\n- \"Please enter a valid email address\" (in the positive example)\n- \"STRIPE LOAD ERROR!\" (in the initializeStripePaymentForSepa function)\n- \"checkoutError\" (in the outputLocalizedText function call in the catch block of the callSepaCreateForStripe function)\n- \"Stripe error response payload\" (in the logThisState call in the catch block of the stripeSubmitCreditCardHandler function)"
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

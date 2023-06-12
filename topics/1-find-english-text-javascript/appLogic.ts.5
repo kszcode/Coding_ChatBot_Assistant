@@ -1,0 +1,130 @@
+
+async function handleSurveySubmit(token: string) {
+    let siteId = window.configSiteID;
+
+    const form = $('#setpw-form');
+    form.removeClass('was-validated');
+    $("#setpw-form input").each(function () {
+        $(this).removeClass("is-invalid");
+    });
+    if (!$('#success_survey_answer').val()) {
+        $("#success_survey_answer", form).addClass("is-invalid");
+        $("#success_survey_answer", form)[0].scrollIntoView();
+        return;
+    }
+
+    $('#setpw-form #create-password-btn').hide();
+    $('#setpw-form .loading-throbber-wrapper').fadeIn('fast');
+    try {
+
+        let surveyResponse = $('#success_survey_answer').val(),
+            surveyData = {
+                'response': surveyResponse
+            },
+            data = {
+                site: siteId,
+                email: $('#email').val(),
+                survey: JSON.stringify(surveyData)
+            };
+
+        await $.ajax({
+            method: "POST",
+            type: "POST",
+            url: `https://aitest.youmaker.com/survey/save?token=${token}`,
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: function (response) {
+                return;
+            },
+            error: function (response) {
+                return;
+            }
+        });
+    } catch (e) {
+        ga('send', 'event', 'Digital Checkout Page', 'Unsuccessful survey response send', e);
+    } finally {
+        try {
+            let fields = {
+                subscription_key: cpState.newSubData && cpState.newSubData.subscription_key,
+                answer: $('#success_survey_answer').val()
+            }
+
+            let urlSaveChannelSource = window.configConductorUrl + 'save_referrer_sub_channels' + `?site_id=${siteId}`;
+            logThisState("handleSurveySubmit: urlSaveChannelSource=" + urlSaveChannelSource + " fields=", JSON.stringify(fields));
+
+            await $.ajax({
+                method: "POST",
+                type: "POST",
+                url: urlSaveChannelSource,
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(fields),
+                success: function (response) {
+                    logThisState('handleSurveySubmit: send survey response success: ', response);
+                    handleSuccessPageRedirect();
+                },
+                error: function (response) {
+                    logThisState('handleSurveySubmit: send survey response fail: ', response);
+                    handleSuccessPageRedirect();
+                }
+            });
+
+        } catch (e) {
+            ga('send', 'event', 'Print Checkout Page', 'Unsuccessful survey response send', e);
+        } finally {
+            if (typeof window.actionAfterThankYou == "function") {
+                try {
+                    window.actionAfterThankYou();
+                } catch (e) {
+                    continueReadingRedirect();
+                }
+            } else {
+                continueReadingRedirect();
+            }
+        }
+    }
+}
+function handleSuccessPageRedirect() {
+    top.window.location.href = "https://dev-profile.epochtimes.de/de/?start=on-boarding";
+}
+/**
+ * set up the capture of user data for each relevant input field
+ */
+function setupBehaviourTracking() {
+    window.fieldBackup = {}
+
+    $('#checkout-form [name="email"]').focusout(() => {
+        let email = $('#checkout-form [name="email"]').val() || "";
+        $.ajax({
+            type: "POST",
+            url: "https://subscribe.theepochtimes.com/api/email.php?action=verify",
+            data: {
+                email: email,
+                emailoversight: false
+            },
+            dataType: 'json',
+            success: function (response) {
+                logThisState("setupBehaviourTracking: success verifying email: " + email + ", got response", response)
+                if (response.valid) {
+
+                }
+            },
+            error: function (response) {
+                logThisState("setupBehaviourTracking: error verifying email: " + email + ", got response", response)
+            }
+        });
+    });
+
+
+
+
+
+
+
+
+
+
+}
+
+//

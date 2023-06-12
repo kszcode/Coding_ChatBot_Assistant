@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7Qi4dBCBvlJXGtjmU0yXu4CLosblY",
+  "object": "chat.completion",
+  "created": 1686600303,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 3193,
+    "completion_tokens": 270,
+    "total_tokens": 3463
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Instructions that could show the user English text:\n- $email.after(`<label id=\"email-error\" class=\"error\" for=\"email\">Please enter a valid email address</label>`);\n- $('.today-total-value').text(getMoneyString(cpState.offerDetail.content.first_billing_amount));\n- $('.payment-delay-text').text(paymentDelay);\n- $('.next .price-value').text('$' + getMoneyString(nextPlan.valueCharge));\n- $('.next .date-value').text(nextRenewal.format('MMMM Do YYYY'));\n- $('.next .frequency-value').text(selectedPlan.planFrequencyString);\n- $errorHolder.text(message);\n- $('#zip').mask('0000');\n- $email.val(email);\n- $('#customer-fname').val(firstname);\n- $('#customer-lname').val(lastname);\n- $(\".gift-value-wrapper\").hide();\n- $(this).addClass(\"focus\");\n- $(this).removeClass(\"focus\");\n- $(this).addClass(\"empty\");\n- $(this).removeClass(\"empty\");\n- $email.val(userInfo.email);\n- $email.attr('disabled', 'true');\n- $('#customer-fname').val(nameArr[0]);\n- $('#customer-lname').val(nameArr[1]);\n- $email.after(`<label id=\"email-error\" class=\"error\" for=\"email\">Please enter a valid email address</label>`);"
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

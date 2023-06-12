@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QiS8n51RHdkjvJjhqMzDfwANhXTX",
+  "object": "chat.completion",
+  "created": 1686601760,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 3420,
+    "completion_tokens": 278,
+    "total_tokens": 3698
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Here are the relevant instructions that could show the user English text:\n\n1. In the `subscriptionAPIs.registerUser` function:\n   - Success message: `'Create user success'`\n   - Error message: `'Create user failure'`\n\n2. In the `subscriptionAPIs.getUserInformation` function:\n   - Success message: `'Get user information success'`\n   - Error message: `'Get user information failure'`\n\n3. In the `subscriptionAPIs.getPaymentMethod` function:\n   - Success message: `'Get payment list success!'`\n   - Error message: `'Get payment information failure'`\n\n4. In the `subscriptionAPIs.getPlanDetails` function:\n   - Success message: `'Get plan information success'`\n   - Error message: `'Get plan information failure'`\n\n5. In the `subscriptionAPIs.changePassword` function:\n   - Success message: `'Successful password update'`\n   - Error message: `'Unsuccessful password update'`\n\n6. In the `subscriptionAPIs.createSubscriptionUsingOfferAndCreditCard` function:\n   - Success message: `'SUCCESS - purchaseSubscription'`\n   - Error message: `'ERROR - purchaseSubscription'`\n\nPlease note that these messages are used for Google Analytics events and might not be directly visible to the user. However, they could still be relevant for translation if you want to track events in German."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

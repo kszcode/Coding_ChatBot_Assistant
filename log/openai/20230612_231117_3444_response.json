@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QiAXOSTsYQLpXCFe7rgzuQDkSoRE",
+  "object": "chat.completion",
+  "created": 1686600669,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 3193,
+    "completion_tokens": 251,
+    "total_tokens": 3444
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Instructions that could show the user English text:\n- $email.after(`<label id=\"email-error\" class=\"error\" for=\"email\">Please enter a valid email address</label>`);\n- $('.payment-delay-text').text(paymentDelay);\n- $('.today-total-value').text(getMoneyString(cpState.offerDetail.content.first_billing_amount));\n- $('.next .price-value').text('$' + getMoneyString(nextPlan.valueCharge));\n- $('.next .date-value').text(nextRenewal.format('MMMM Do YYYY'));\n- $('.next .frequency-value').text(selectedPlan.planFrequencyString);\n- $errorHolder.text(message);\n- $('#zip').mask('0000');\n- $input.on(\"focus\", function () {\n        $(this).addClass(\"focus\");\n    });\n- $input.on(\"blur\", function () {\n        $(this).removeClass(\"focus\");\n    });\n- $input.on(\"keyup\", function () {\n        if ($(this).val()) {\n            $(this).removeClass(\"empty\");\n            $(this).addClass(\"val\");\n        } else {\n            $(this).addClass(\"empty\");\n            $(this).removeClass(\"val\");\n        }\n    });\n- \"Please enter a valid email address\" (inside the label element in the first instruction)"
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

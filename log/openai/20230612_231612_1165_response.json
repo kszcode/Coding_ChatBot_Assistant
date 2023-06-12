@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QiFQrIqcYgLFmIlRUDtqc5Dh6IyC",
+  "object": "chat.completion",
+  "created": 1686600972,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 1116,
+    "completion_tokens": 49,
+    "total_tokens": 1165
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Instructions that could show the user English text:\n- \"Please enter a valid email address\" (line 2)\n- \"ERROR check existing subs info\" (line 67)\n- \"ERROR check existing payment information\" (line 85)"
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

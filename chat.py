@@ -45,7 +45,9 @@ class AppState:
 
         content = read_file_content(file_path)
 
-        properties = {}
+        properties = {
+            'user_message': '',
+        }
         for line in content.splitlines():
             if line.startswith('- `SYSTEM_MESSAGE_FILE`:'):
                 properties['SYSTEM_MESSAGE_FILE'] = line.split(':', 1)[1].strip()

@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QiBtkG20HCxWQYdpUGszlgn5LSdC",
+  "object": "chat.completion",
+  "created": 1686600753,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 3191,
+    "completion_tokens": 186,
+    "total_tokens": 3377
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Here are the relevant instructions that could show the user English text:\n\n1. `$email.after(`<label id=\"email-error\" class=\"error\" for=\"email\">Please enter a valid email address</label>`);`\n2. `function displayError(message: string) { $errorHolder.text(message); }`\n3. `$('.today-total-value').text(getMoneyString(cpState.offerDetail.content.first_billing_amount));`\n4. `$('.payment-delay-text').text(paymentDelay);`\n5. `$('.next .price-value').text('$' + getMoneyString(nextPlan.valueCharge));`\n6. `$('.next .date-value').text(nextRenewal.format('MMMM Do YYYY'));`\n7. `$('.next .frequency-value').text(selectedPlan.planFrequencyString);`\n\nPlease note that some of these instructions use variables, so the actual text displayed to the user might change depending on the values of those variables."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7Qi1VaZ43MH3BuBsKHx3ameJybme2",
+  "object": "chat.completion",
+  "created": 1686600109,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 4068,
+    "completion_tokens": 29,
+    "total_tokens": 4097
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Instructions that could show the user English text:\n- $email.after(`<label id=\"email-error\" class=\"error\" for=\"email\">Please"
+      },
+      "finish_reason": "length",
+      "index": 0
+    }
+  ]
+}

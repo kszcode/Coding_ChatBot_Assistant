@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QiI39gFhcWxwsjuU91bCBNnWYKAm",
+  "object": "chat.completion",
+  "created": 1686601135,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 2905,
+    "completion_tokens": 369,
+    "total_tokens": 3274
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "- outputLocalizedText('.subscription-create-error', 'Please enter a valid email address');\n- $('.subscription-create-error').text('Unable to create subscription, please try again later.');\n- outputLocalizedText('.subscription-create-error', 'Unable to checkout, please verify that your payment details are correct.');\n- outputLocalizedText('.subscription-create-error', 'AVS check failed');\n- outputLocalizedText('.subscription-create-error', 'Prepaid cards are not supported');\n- outputLocalizedText('.subscription-create-error', 'An error occurred while processing your payment. Please try again later or contact customer support for assistance.');\n- $('.loading-throbber-wrapper').hide();\n- $('#purchase-btn').show();\n- $('#checkout-form').find(':input[type=submit]').prop('disabled', false);\n- $(\".paypal-checkout-overlay\").show();\n- $(\".paypal-checkout-overlay\").hide();\n- $(paypalWin.document.body).html(paypalLoadingBody);\n- $purchase.attr('disabled', 'disabled');\n- $purchase.removeAttr('disabled');\n- $loading.fadeIn('fast');\n- $loading.hide();\n- $('#checkout-form').find(':input[type=submit]').prop('disabled', false);\n- ga('send', 'event', 'Digital Checkout Page', 'ERROR - completePurchase');\n- ga('send', 'event', 'Digital Checkout Page - Error Log', 'checkoutpage:completePurchase', e.message);\n- window.epSubs.trackDataEvent({...});\n- window.epSubs.trackGAEvent(\"paywall:Conversion Paid Subscription\", planData, cpState.newSubData.subscription_key);\n- window.epSubs.trackGAEvent(\"paywall:Checkout Process\", \"Checkout Success\");\n- window.epSubs.trackGAPageview(\"/virtual/goals/paid-subscription/\" + planData + \"/\" + cpState.newSubData.subscription_key);"
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}
