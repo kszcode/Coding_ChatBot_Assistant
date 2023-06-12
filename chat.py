@@ -1,9 +1,9 @@
 import argparse
 import json
 import os
-import re
 import textwrap
 import time
+import traceback
 from datetime import datetime
 from typing import Any, Union
 from typing import List
@@ -20,6 +20,8 @@ class AppState:
         self.SYSTEM_MESSAGE_FILE = 'system-message.md'
         self.SCRATCH_PAD_FILE = 'scratch-pad.py'
         self.TOPIC_FOLDER = os.path.dirname(self.USER_MESSAGE_FILE)
+        self.SCRATCH_PAD_SPLIT_TEXT = "sfh-split-file-here"
+        self.SCRATCH_PAD_SPLIT_INDEX = 0
         self.ALL_MESSAGES = list()
         self.user_message = ""
 
@@ -31,6 +33,8 @@ class AppState:
 
     def read_user_message_file(self):
         file_path = self.for_topic_get(app_state.USER_MESSAGE_FILE)
+        self.TOPIC_FOLDER = os.path.dirname(file_path)
+
         content = read_file_content(file_path)
         properties = {
             'system_message_file': '',
@@ -49,6 +53,8 @@ class AppState:
                 properties['split_index'] = int(line.split(':', 1)[1].strip())
             elif line.startswith('- `user_message`:'):
                 properties['user_message'] = line.split(':', 1)[1].strip()
+            elif line.startswith(' # '):
+                pass  # ignore comments
             else:
                 properties['user_message'] += '\n' + line
 
@@ -134,7 +140,9 @@ def read_file_content(filepath):
             return infile.read()
     except FileNotFoundError:
         print(f"File {filepath} not found.")
-        exit(1)
+        # show the entire stack trace
+        traceback.print_exc()
+        exit(2)
 
 
 # Section:     API functions
@@ -221,7 +229,7 @@ def print_chatbot_response(response, total_tokens, processing_time):
 def read_scratchpad_file(file_path, split_index=None):
     content = read_file_content(file_path)
     if split_index is not None:
-        splits = re.split(r'\n\s*sfh-split-file-here\s*\n', content)
+        splits = content.split(app_state.SCRATCH_PAD_SPLIT_TEXT)
         if split_index < len(splits):
             return splits[split_index]
         else:
@@ -240,22 +248,21 @@ def main():
     parser.add_argument("--user_message_file", type=str, default=f"{app_state.USER_MESSAGE_FILE}",
                         help="Path to the user-message.md file.")
     args = parser.parse_args()
+    print("Sample app usage: python chat.py --user_message_file path-to/user-message.md")
 
     # Update the user message file path in the app state
     app_state.USER_MESSAGE_FILE = args.user_message_file
 
     app_state.read_user_message_file()
 
-    print(f"Current settings:\n"
-          f"Model: {app_state.MODEL_NAME}\n"
-          f"Temperature: {app_state.MODEL_TEMPERATURE}")
-    print("Sample app usage: python chat.py --model gpt-3.5-turbo --temperature 0.2")
-
     print(f"\n\nInput files:\n"
-          f"Topic folder: {app_state.TOPIC_FOLDER}\n"
-          f"User message: {app_state.USER_MESSAGE_FILE}\n"
-          f"System message: {app_state.SYSTEM_MESSAGE_FILE}\n"
-          f"Scratchpad: {app_state.SCRATCH_PAD_FILE}")
+          f" - Topic folder: {app_state.TOPIC_FOLDER}\n"
+          f" - User message: {app_state.USER_MESSAGE_FILE}\n"
+          f" - System message: {app_state.SYSTEM_MESSAGE_FILE}\n"
+          f" - Scratchpad: {app_state.SCRATCH_PAD_FILE}")
+    print(f"Model settings:\n"
+          f" - Model: {app_state.MODEL_NAME}\n"
+          f" - Temperature: {app_state.MODEL_TEMPERATURE}")
 
     print(f"\n\nUser message is:"
           f"\n{app_state.user_message}"
@@ -263,9 +270,14 @@ def main():
 
     # continue with composing conversation and response
     app_state.ALL_MESSAGES.append({'role': 'user', 'content': app_state.user_message})
+    scratch_pad_content = read_scratchpad_file(
+        app_state.for_topic_get(app_state.SCRATCH_PAD_FILE),
+        app_state.SCRATCH_PAD_SPLIT_INDEX,
+    )
+    print(f"\n\nScratchpad content is:\n{scratch_pad_content}\n\n")
     system_message = read_file_content(
         app_state.for_topic_get(app_state.SYSTEM_MESSAGE_FILE),
-    ).replace('<<CODE>>', read_file_content(app_state.for_topic_get(app_state.SCRATCH_PAD_FILE)))
+    ).replace('<<CODE>>', scratch_pad_content)
     conversation = list()
     conversation += app_state.ALL_MESSAGES
     conversation.append({'role': 'system', 'content': system_message})
