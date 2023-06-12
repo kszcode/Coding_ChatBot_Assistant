@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7Qfb1NEcu7lOFgG6pGMP498aeTmXM",
+  "object": "chat.completion",
+  "created": 1686590779,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 2370,
+    "completion_tokens": 101,
+    "total_tokens": 2471
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "You can use triple backticks (```) to create code blocks in markdown files. This will make the properties stand out and be more readable. Here's an example of how you can highlight the properties in the markdown file:\n\n```markdown\nsystem_message_file: `system_message_file`\nscratchpad_file: `scratchpad_file`\nsplit_index: `split_index`\nuser_message: `user_message`\n```\n\nThis will display the properties within a code block, making them more noticeable and easier to read."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

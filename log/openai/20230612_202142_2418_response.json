@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QfWO99U0hugAbKZ53a27eBHs10sM",
+  "object": "chat.completion",
+  "created": 1686590492,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 2335,
+    "completion_tokens": 83,
+    "total_tokens": 2418
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "```python\nuser_message_file = '''system_message_file: system-message.md\nscratchpad_file: scratch-pad.py\nsplit_index: 0\nuser_message: Generate a sample user message file.\n'''\n\nwith open(\"user-message.md\", \"w\") as f:\n    f.write(user_message_file)\n```\n\nThis code snippet creates a sample user message file named `user-message.md` with the given content."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

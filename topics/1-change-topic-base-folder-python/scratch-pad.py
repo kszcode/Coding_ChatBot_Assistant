@@ -52,9 +52,11 @@ class AppState:
             else:
                 properties['user_message'] += '\n' + line
 
-        self.SYSTEM_MESSAGE_FILE = properties['system_message_file']
-        self.SCRATCH_PAD_FILE = properties['scratchpad_file']
-        self.USER_MESSAGE_FILE = file_path
+        if properties['system_message_file'] is not None and properties['system_message_file'] != '':
+            self.SYSTEM_MESSAGE_FILE = properties['system_message_file']
+        if properties['scratchpad_file'] is not None and properties['scratchpad_file'] != '':
+            self.SCRATCH_PAD_FILE = properties['scratchpad_file']
+
         self.user_message = properties['user_message']
 
 
