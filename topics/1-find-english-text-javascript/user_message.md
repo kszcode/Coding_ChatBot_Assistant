@@ -1,6 +1,10 @@
-- `system_message_file`: system-message-javascript-assistant.txt
-- `scratchpad_file`: appLogic.ts
-- `split_index`: 0
+- `SYSTEM_MESSAGE_FILE`: system-message-javascript-assistant.txt
+- `SCRATCH_PAD_FILE`: appLogic.ts
+- `SCRATCH_PAD_SPLIT_TEXT`: sfh-split-file-here
+- `SCRATCH_PAD_SPLIT_INDEX`: 0
+- `TOPIC_FOLDER`: 
+ # - `MODEL_NAME`: gpt-4
+- `MODEL_TEMPERATURE`: 0.2 
 - `user_message`: 
 
 I want this script to prompt the user with German language.

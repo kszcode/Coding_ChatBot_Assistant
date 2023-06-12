@@ -13,9 +13,9 @@ import openai
 
 class AppState:
     def __init__(self):
-        self.MODEL_NAME = "gpt-4"
+        # self.MODEL_NAME = "gpt-4"
+        self.MODEL_NAME = "gpt-3.5-turbo"
         self.MODEL_TEMPERATURE = 0.1
-        self.MODEL_MAX_TOKENS = 7500
         self.USER_MESSAGE_FILE = os.path.join(os.getcwd(), 'topics/1-change-topic-base-folder-python/user-message.md')
         self.SYSTEM_MESSAGE_FILE = 'system-message.md'
         self.SCRATCH_PAD_FILE = 'scratch-pad.py'
@@ -31,26 +31,36 @@ class AppState:
         else:
             return os.path.join(self.TOPIC_FOLDER, file_path)
 
+    def set_property(self, properties, property_name):
+        property_value = properties.get(property_name)
+        if property_value is not None:
+            if isinstance(property_value, str):
+                property_value = property_value.strip()  # remove white spaces
+            if property_value:  # if the string is not empty after removing spaces
+                setattr(self, property_name, property_value)
+
     def read_user_message_file(self):
         file_path = self.for_topic_get(app_state.USER_MESSAGE_FILE)
         self.TOPIC_FOLDER = os.path.dirname(file_path)
 
         content = read_file_content(file_path)
         properties = {
-            'system_message_file': '',
-            'scratchpad_file': '',
-            'split_index': None,
+            'SYSTEM_MESSAGE_FILE': '',
+            'SCRATCH_PAD_FILE': '',
+            'SCRATCH_PAD_SPLIT_INDEX': None,
             'user_message': '',
             'log_folder': os.path.dirname(file_path),
         }
 
         for line in content.splitlines():
-            if line.startswith('- `system_message_file`:'):
-                properties['system_message_file'] = line.split(':', 1)[1].strip()
-            elif line.startswith('- `scratchpad_file`:'):
-                properties['scratchpad_file'] = line.split(':', 1)[1].strip()
-            elif line.startswith('- `split_index`:'):
-                properties['split_index'] = int(line.split(':', 1)[1].strip())
+            if line.startswith('- `SYSTEM_MESSAGE_FILE`:'):
+                properties['SYSTEM_MESSAGE_FILE'] = line.split(':', 1)[1].strip()
+            elif line.startswith('- `SCRATCH_PAD_FILE`:'):
+                properties['SCRATCH_PAD_FILE'] = line.split(':', 1)[1].strip()
+            elif line.startswith('- `SCRATCH_PAD_SPLIT_INDEX`:'):
+                properties['SCRATCH_PAD_SPLIT_INDEX'] = int(line.split(':', 1)[1].strip())
+            elif line.startswith('- `SCRATCH_PAD_SPLIT_TEXT`:'):
+                properties['SCRATCH_PAD_SPLIT_TEXT'] = line.split(':', 1)[1].strip()
             elif line.startswith('- `user_message`:'):
                 properties['user_message'] = line.split(':', 1)[1].strip()
             elif line.startswith(' # '):
@@ -58,12 +68,21 @@ class AppState:
             else:
                 properties['user_message'] += '\n' + line
 
-        if properties['system_message_file'] is not None and properties['system_message_file'] != '':
-            self.SYSTEM_MESSAGE_FILE = properties['system_message_file']
-        if properties['scratchpad_file'] is not None and properties['scratchpad_file'] != '':
-            self.SCRATCH_PAD_FILE = properties['scratchpad_file']
+        self.set_property(properties, 'SYSTEM_MESSAGE_FILE')
+        self.set_property(properties, 'SCRATCH_PAD_FILE')
+        self.set_property(properties, 'SCRATCH_PAD_SPLIT_INDEX')
+        self.set_property(properties, 'SCRATCH_PAD_SPLIT_TEXT')
+        self.set_property(properties, 'TOPIC_FOLDER')
+        self.set_property(properties, 'MODEL_TEMPERATURE')
+        self.set_property(properties, 'user_message')
 
-        self.user_message = properties['user_message']
+    def get_max_tokens_for_current_model(self):
+        if self.MODEL_NAME == "gpt-4":
+            return 7500  # more like 8k, but we live a bit of room for the response
+        elif self.MODEL_NAME == "gpt-3.5-turbo":
+            return 3500  # more like 4k, but we live a bit of room for the response
+        else:
+            raise Exception(f"Unknown model name: {self.MODEL_NAME}")
 
 
 app_state = AppState()
@@ -177,6 +196,10 @@ def perform_chatbot_conversation(conversation: List[dict]) -> tuple[Any, Any, fl
             start_time = time.time()
             print("INFO: Processing...")
 
+            if len(conversation) == 0:
+                print("INFO: Empty conversation, skipping...")
+                return "", 0, 0
+
             response = fetch_chatbot_response(conversation)
             text = response['choices'][0]['message']['content']
             total_tokens = response['usage']['total_tokens']
@@ -274,7 +297,12 @@ def main():
         app_state.for_topic_get(app_state.SCRATCH_PAD_FILE),
         app_state.SCRATCH_PAD_SPLIT_INDEX,
     )
-    print(f"\n\nScratchpad content is:\n{scratch_pad_content}\n\n")
+
+    scratch_pad_content_lines = scratch_pad_content.split('\n')
+    if len(scratch_pad_content_lines) > 4:
+        print(
+            f"\n\nScratchpad content is:\n{scratch_pad_content_lines[0]}\n{scratch_pad_content_lines[1]}\n...\n{scratch_pad_content_lines[-2]}\n{scratch_pad_content_lines[-1]}\n\n")
+
     system_message = read_file_content(
         app_state.for_topic_get(app_state.SYSTEM_MESSAGE_FILE),
     ).replace('<<CODE>>', scratch_pad_content)
@@ -285,7 +313,7 @@ def main():
     # generate a response
     response, tokens, processing_time = perform_chatbot_conversation(conversation)
 
-    if tokens > app_state.MODEL_MAX_TOKENS:
+    if tokens > app_state.get_max_tokens_for_current_model():
         app_state.ALL_MESSAGES.pop(0)
 
     app_state.ALL_MESSAGES.append({'role': 'assistant', 'content': response})
