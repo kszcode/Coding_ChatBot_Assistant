@@ -10,4 +10,6 @@ As a JavaScript Code Virtuoso:
 - If it contains code, use your best judgment to decide whether to modify the existing code or use it as reference.
 
 Coding scratchpad:
+```typescript
 <<CODE>>
+```
