@@ -400,13 +400,8 @@ export async function checkExistingPayment() {
         ga('send', 'event', 'Digital Checkout Page', 'ERROR check existing payment information', JSON.stringify(error));
     }
 }
-function getStripeKey() {
-    let stripeKey = 'pk_live_51HpXGBBkvvoYiDHGJ6bwN8ra8hRMN16nE8QY0I0dMIX7gbaPQd7SV4oTBUKFLAvmPFUgbDLjVjjA9he3Tsa4hGzK00G1nLIwsC';
-    if (window.configUseTestStripe) {
-        stripeKey = 'pk_test_51HpXGBBkvvoYiDHGVkmhqveXeGJtvNR0jAVAqDBK7oqTKybcPEFWL17TvMMgdrNOEUVHH7JkDNjQCNnam1zqWacm00O3SvLEmB';
-    }
-    return stripeKey;
-}
+
+//sfh-split-file-here
 async function initializeStripePaymentForSepa() {
     logThisState("initializeStripePaymentForSepa: called");
     cpState.paymentType = 'stripe-sepa-payment';
@@ -695,32 +690,6 @@ async function completePurchase() {
         logThisState("completePurchase: window._cpStripeDict.sepaResponsePayload",
             window._cpStripeDict.sepaResponsePayload);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         let stripeResponse = (window._cpStripeDict
             && window._cpStripeDict.sepaResponsePayload
             && window._cpStripeDict.sepaResponsePayload.source) || {};
@@ -871,7 +840,7 @@ async function purchaseSubscription() {
 }
 
 
-
+//sfh-split-file-here
 
 
 /**
@@ -1252,6 +1221,9 @@ function setupBehaviourTracking() {
 
 
 }
+
+//sfh-split-file-here
+
 window.UpgradeOffer = {
     start: function () {
         const forceOnboarding = true;
@@ -1617,6 +1589,8 @@ export const subscriptionAPIs = {
             }
         });
     },
+
+//sfh-split-file-here
 
     createSubsForExistingCustomer: function () {
         let subData = {

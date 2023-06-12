@@ -1,7 +1,7 @@
 - `SYSTEM_MESSAGE_FILE`: system-message-javascript-assistant.txt
 - `SCRATCH_PAD_FILE`: appLogic.ts
 - `SCRATCH_PAD_SPLIT_TEXT`: sfh-split-file-here
-- `SCRATCH_PAD_SPLIT_INDEX`: 0
+- `SCRATCH_PAD_SPLIT_INDEX`: 1
 - `TOPIC_FOLDER`: 
  # - `MODEL_NAME`: gpt-4
 - `MODEL_TEMPERATURE`: 0.2 

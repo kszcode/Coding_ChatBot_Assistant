@@ -84,6 +84,28 @@ class AppState:
         else:
             raise Exception(f"Unknown model name: {self.MODEL_NAME}")
 
+    def get_scratch_pad_splits_info(self):
+        file_path = self.for_topic_get(app_state.SCRATCH_PAD_FILE)
+        content = read_file_content(file_path)
+        splits = content.split(app_state.SCRATCH_PAD_SPLIT_TEXT)
+        return [len(split) for split in splits]
+
+    def read_scratchpad_content(self):
+        file_path = self.for_topic_get(app_state.SCRATCH_PAD_FILE)
+        content = read_file_content(file_path)
+        splits = content.split(app_state.SCRATCH_PAD_SPLIT_TEXT)
+        split_index = app_state.SCRATCH_PAD_SPLIT_INDEX
+        if split_index is not None:
+            if split_index < len(splits):
+                if len(splits) > 1:
+                    save_content_to_file(f"{file_path}.{split_index}", splits[split_index])
+                return splits[split_index]
+            else:
+                print(f"Error: split_index {split_index} is out of range.")
+                exit(1)
+        else:
+            return content
+
 
 app_state = AppState()
 
@@ -249,19 +271,6 @@ def print_chatbot_response(response, total_tokens, processing_time):
     print(f'\n\nINFO: {app_state.MODEL_NAME}: {total_tokens} tokens, {processing_time:.2f} seconds')
 
 
-def read_scratchpad_file(file_path, split_index=None):
-    content = read_file_content(file_path)
-    if split_index is not None:
-        splits = content.split(app_state.SCRATCH_PAD_SPLIT_TEXT)
-        if split_index < len(splits):
-            return splits[split_index]
-        else:
-            print(f"Error: split_index {split_index} is out of range.")
-            exit(1)
-    else:
-        return content
-
-
 def main():
     # instantiate chatbot
     openai.api_key = read_file_content('key_openai.txt').strip()
@@ -278,25 +287,31 @@ def main():
 
     app_state.read_user_message_file()
 
-    print(f"\n\nInput files:\n"
-          f" - Topic folder: {app_state.TOPIC_FOLDER}\n"
-          f" - User message: {app_state.USER_MESSAGE_FILE}\n"
-          f" - System message: {app_state.SYSTEM_MESSAGE_FILE}\n"
-          f" - Scratchpad: {app_state.SCRATCH_PAD_FILE}")
-    print(f"Model settings:\n"
-          f" - Model: {app_state.MODEL_NAME}\n"
-          f" - Temperature: {app_state.MODEL_TEMPERATURE}")
+    scratchpad_split_sizes = app_state.get_scratch_pad_splits_info()
 
-    print(f"\n\nUser message is:"
+    print(f"\nParameters:"
+          f"\n-----------\n"
+          f" - MODEL_NAME       : {app_state.MODEL_NAME}\n"
+          f" - MODEL_TEMPERATURE: {app_state.MODEL_TEMPERATURE}\n"
+          f" - TOPIC_FOLDER     : {app_state.TOPIC_FOLDER}\n"
+          f" - USER_MESSAGE_FILE: {app_state.USER_MESSAGE_FILE}\n"
+          f" - SYSTEM_MESSAGE_FILE    : {app_state.SYSTEM_MESSAGE_FILE}\n"
+          f" - SCRATCH_PAD_FILE       : {app_state.SCRATCH_PAD_FILE}\n"
+          )
+    if len(scratchpad_split_sizes) > 0:
+        print(
+            f" - SCRATCH_PAD_SPLIT_TEXT : {app_state.SCRATCH_PAD_SPLIT_TEXT}\n"
+            f" - SCRATCH_PAD_SPLIT_INDEX: {app_state.SCRATCH_PAD_SPLIT_INDEX}/{len(scratchpad_split_sizes)}\n"
+            f" - Scratchpad split sizes: {scratchpad_split_sizes}\n")
+
+    print(f"\nUser message is:"
+          f"\n----------------"
           f"\n{app_state.user_message}"
           f"\n\n")
 
     # continue with composing conversation and response
     app_state.ALL_MESSAGES.append({'role': 'user', 'content': app_state.user_message})
-    scratch_pad_content = read_scratchpad_file(
-        app_state.for_topic_get(app_state.SCRATCH_PAD_FILE),
-        app_state.SCRATCH_PAD_SPLIT_INDEX,
-    )
+    scratch_pad_content = app_state.read_scratchpad_content()
 
     scratch_pad_content_lines = scratch_pad_content.split('\n')
     if len(scratch_pad_content_lines) > 4:
