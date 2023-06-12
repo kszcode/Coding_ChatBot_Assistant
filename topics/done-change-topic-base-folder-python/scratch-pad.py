@@ -1,23 +1,7 @@
-# USER:
-there are 3 function names that could be named better. Tell me which one need to be updated and why.
-
-# SYSTEM:
-You are a Python coding assistant.
-The USER will give you instructions to help write functions.
-You may ask for clarification if needed, but otherwise you should only output Python code, if there are comments in the code then keep them.
-Adhere to PEP8. Provide explanations of the code only if the user asks for them.
-
-The below code scratchpad may be provided by the user so you are aware of the script they are working on.
-Note, this information may be blank.
-Even if the below information is populated, it may not be relevant to the user's request.
-Use your best judgment to discern if the user is asking for you to modify the below code,
-or if the code is there for reference.
-
-Coding scratchpad:
-```python
 import argparse
 import json
 import os
+import re
 import textwrap
 import time
 from datetime import datetime
@@ -32,7 +16,48 @@ class AppState:
         self.MODEL_NAME = "gpt-4"
         self.MODEL_TEMPERATURE = 0.1
         self.MODEL_MAX_TOKENS = 7500
+        self.USER_MESSAGE_FILE = 'user-message.md'
+        self.SYSTEM_MESSAGE_FILE = 'system-message.md'
+        self.SCRATCH_PAD_FILE = 'scratch-pad.py'
+        self.TOPIC_FOLDER = os.path.join(os.getcwd(), 'topics/1-change-topic-base-folder-python')
         self.ALL_MESSAGES = list()
+        self.user_message = ""
+
+    def for_topic_get(self, file_path):
+        if os.path.exists(file_path):
+            return file_path
+        else:
+            return os.path.join(self.TOPIC_FOLDER, file_path)
+
+    def read_user_message_file(self):
+        file_path = self.for_topic_get(app_state.USER_MESSAGE_FILE)
+        content = read_file_content(file_path)
+        properties = {
+            'system_message_file': '',
+            'scratchpad_file': '',
+            'split_index': None,
+            'user_message': '',
+            'log_folder': os.path.dirname(file_path),
+        }
+
+        for line in content.splitlines():
+            if line.startswith('system_message_file:'):
+                properties['system_message_file'] = line.split(':', 1)[1].strip()
+            elif line.startswith('scratchpad_file:'):
+                properties['scratchpad_file'] = line.split(':', 1)[1].strip()
+            elif line.startswith('split_index:'):
+                properties['split_index'] = int(line.split(':', 1)[1].strip())
+            elif line.startswith('user_message:'):
+                properties['user_message'] = line.split(':', 1)[1].strip()
+            else:
+                properties['user_message'] += '\n' + line
+
+        if properties['system_message_file'] is not None and properties['system_message_file'] != '':
+            self.SYSTEM_MESSAGE_FILE = properties['system_message_file']
+        if properties['scratchpad_file'] is not None and properties['scratchpad_file'] != '':
+            self.SCRATCH_PAD_FILE = properties['scratchpad_file']
+
+        self.user_message = properties['user_message']
 
 
 app_state = AppState()
@@ -42,7 +67,7 @@ app_state = AppState()
 
 def create_log_file(suffix: str) -> str:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_dir = "log/openai"
+    log_dir = app_state.for_topic_get("./")
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     log_file = os.path.join(log_dir, f"{timestamp}{suffix}")
@@ -57,7 +82,7 @@ def save_request_as_human_readable_text(conversation, suffix):
             human_readable_text += f"# {message['role'].upper()}:\n{message['content']}\n\n"
         else:
             print(f"Skipping message due to missing 'role' or 'content': {message}")
-    save_file(log_file, human_readable_text)
+    save_content_to_file(log_file, human_readable_text)
 
 
 def save_response_as_human_readable_text(response, total_tokens, duration, suffix=""):
@@ -74,7 +99,7 @@ def save_response_as_human_readable_text(response, total_tokens, duration, suffi
             human_readable_text += f"# {message['role'].upper()}:\n{message['content']}\n\n"
         else:
             print(f"Skipping message due to missing 'role' or 'content': {message}")
-    save_file(log_file, human_readable_text)
+    save_content_to_file(log_file, human_readable_text)
 
 
 def pretty_print_json(conversation: Any) -> Union[str, Any]:
@@ -92,24 +117,28 @@ def save_json_log(conversation, suffix, pretty_print=True):
     log_file = os.path.join(log_dir, f"{timestamp}{suffix}.json")
     if pretty_print:
         conversation = pretty_print_json(conversation)
-    save_file(log_file, str(conversation))
+    save_content_to_file(log_file, str(conversation))
 
 
 # Section:     file operations
 
-def save_file(filepath, content):
+def save_content_to_file(filepath, content):
     with open(filepath, 'w', encoding='utf-8') as outfile:
         outfile.write(content)
 
 
-def open_file(filepath):
-    with open(filepath, 'r', encoding='utf-8', errors='ignore') as infile:
-        return infile.read()
+def read_file_content(filepath):
+    try:
+        with open(filepath, 'r', encoding='utf-8', errors='ignore') as infile:
+            return infile.read()
+    except FileNotFoundError:
+        print(f"File {filepath} not found.")
+        exit(1)
 
 
 # Section:     API functions
 
-def get_response(conversation: List[dict]) -> dict:
+def fetch_chatbot_response(conversation: List[dict]) -> dict:
     return openai.ChatCompletion.create(
         model=app_state.MODEL_NAME,
         messages=conversation,
@@ -139,7 +168,7 @@ def perform_chatbot_conversation(conversation: List[dict]) -> tuple[Any, Any, fl
             start_time = time.time()
             print("INFO: Processing...")
 
-            response = get_response(conversation)
+            response = fetch_chatbot_response(conversation)
             text = response['choices'][0]['message']['content']
             total_tokens = response['usage']['total_tokens']
 
@@ -180,20 +209,6 @@ def multi_line_input():
     return "\n".join(lines)
 
 
-def get_user_input():
-    # get user input
-    text = input(f'[{app_state.MODEL_NAME}] USER PROMPT: ')
-    if 'END' == text:
-        print('\n\nExiting...')
-        exit(0)
-    if 'SCRATCHPAD' == text or 'M' == text:
-        text = multi_line_input()
-        save_file('scratchpad.md', text.strip('END').strip())
-        print('\n\n#####      Scratchpad updated!')
-        return None
-    return text
-
-
 def print_chatbot_response(response, total_tokens, processing_time):
     print('\n\n\n\nCHATBOT response:\n')
     formatted_lines = [textwrap.fill(line, width=120) for line in response.split('\n')]
@@ -202,58 +217,58 @@ def print_chatbot_response(response, total_tokens, processing_time):
     print(f'\n\nINFO: {app_state.MODEL_NAME}: {total_tokens} tokens, {processing_time:.2f} seconds')
 
 
+def read_scratchpad_file(file_path, split_index=None):
+    content = read_file_content(file_path)
+    if split_index is not None:
+        splits = re.split(r'\n\s*sfh-split-file-here\s*\n', content)
+        if split_index < len(splits):
+            return splits[split_index]
+        else:
+            print(f"Error: split_index {split_index} is out of range.")
+            exit(1)
+    else:
+        return content
+
+
 def main():
     # instantiate chatbot
-    openai.api_key = open_file('key_openai.txt').strip()
+    openai.api_key = read_file_content('key_openai.txt').strip()
 
-    # parse arguments
-    parser = argparse.ArgumentParser(description="Chatbot using OpenAI API")
-    parser.add_argument("--model", default=app_state.MODEL_NAME,
-                        help="Model name (default: %(default)s)")
-    parser.add_argument("--temperature", type=float, default=app_state.MODEL_TEMPERATURE,
-                        help="Temperature (default: %(default)s)")
-    args, unknown = parser.parse_known_args()
-
-    app_state.MODEL_NAME = args.model
-    app_state.MODEL_TEMPERATURE = args.temperature
+    app_state.read_user_message_file()
 
     print(f"Current settings:\n"
           f"Model: {app_state.MODEL_NAME}\n"
           f"Temperature: {app_state.MODEL_TEMPERATURE}")
     print("Sample app usage: python chat.py --model gpt-3.5-turbo --temperature 0.2")
 
+    print(f"\n\nInput files:\n"
+          f"Topic folder: {app_state.TOPIC_FOLDER}\n"
+          f"User message: {app_state.USER_MESSAGE_FILE}\n"
+          f"System message: {app_state.SYSTEM_MESSAGE_FILE}\n"
+          f"Scratchpad: {app_state.SCRATCH_PAD_FILE}")
 
-    print("\n\n****** IMPORTANT ******\n"
-          "Type 'SCRATCHPAD' or 'M' to enter multi-line input mode to update the scratchpad.\n"
-          "Type 'END' to save and exit.\n")
+    print(f"\n\nUser message is:"
+          f"\n{read_file_content(app_state.user_message)}"
+          f"\n\n")
 
-    while True:
-        text = get_user_input()
-        if text is None:
-            continue
-        if text == '':
-            # empty submission, probably on accident
-            continue
+    # continue with composing conversation and response
+    app_state.ALL_MESSAGES.append({'role': 'user', 'content': app_state.user_message})
+    system_message = read_file_content(
+        app_state.for_topic_get(app_state.SYSTEM_MESSAGE_FILE),
+    ).replace('<<CODE>>', read_file_content(app_state.for_topic_get(app_state.SCRATCH_PAD_FILE)))
+    conversation = list()
+    conversation += app_state.ALL_MESSAGES
+    conversation.append({'role': 'system', 'content': system_message})
 
-        # continue with composing conversation and response
-        app_state.ALL_MESSAGES.append({'role': 'user', 'content': text})
-        system_message = open_file('system_message.txt').replace('<<CODE>>', open_file('scratchpad.md'))
-        conversation = list()
-        conversation += app_state.ALL_MESSAGES
-        conversation.append({'role': 'system', 'content': system_message})
+    # generate a response
+    response, tokens, processing_time = perform_chatbot_conversation(conversation)
 
-        # generate a response
-        response, tokens, processing_time = perform_chatbot_conversation(conversation)
+    if tokens > app_state.MODEL_MAX_TOKENS:
+        app_state.ALL_MESSAGES.pop(0)
 
-        if tokens > app_state.MODEL_MAX_TOKENS:
-            app_state.ALL_MESSAGES.pop(0)
-
-        app_state.ALL_MESSAGES.append({'role': 'assistant', 'content': response})
-        print_chatbot_response(response, tokens, processing_time)
+    app_state.ALL_MESSAGES.append({'role': 'assistant', 'content': response})
+    print_chatbot_response(response, tokens, processing_time)
 
 
 if __name__ == '__main__':
     main()
-
-```
-
