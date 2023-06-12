@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import re
 import textwrap
 import time
 from datetime import datetime
@@ -20,9 +21,41 @@ class AppState:
         self.SCRATCH_PAD_FILE = 'scratch-pad.py'
         self.TOPIC_FOLDER = os.path.join(os.getcwd(), 'topics/1-change-topic-base-folder-python')
         self.ALL_MESSAGES = list()
+        self.user_message = ""
 
-    def for_topic_get(self, relative_path):
-        return os.path.join(self.TOPIC_FOLDER, relative_path)
+    def for_topic_get(self, file_path):
+        if os.path.exists(file_path):
+            return file_path
+        else:
+            return os.path.join(self.TOPIC_FOLDER, file_path)
+
+    def read_user_message_file(self):
+        file_path = self.for_topic_get(app_state.USER_MESSAGE_FILE)
+        content = read_file_content(file_path)
+        properties = {
+            'system_message_file': '',
+            'scratchpad_file': '',
+            'split_index': None,
+            'user_message': '',
+            'log_folder': os.path.dirname(file_path),
+        }
+
+        for line in content.splitlines():
+            if line.startswith('system_message_file:'):
+                properties['system_message_file'] = line.split(':', 1)[1].strip()
+            elif line.startswith('scratchpad_file:'):
+                properties['scratchpad_file'] = line.split(':', 1)[1].strip()
+            elif line.startswith('split_index:'):
+                properties['split_index'] = int(line.split(':', 1)[1].strip())
+            elif line.startswith('user_message:'):
+                properties['user_message'] = line.split(':', 1)[1].strip()
+            else:
+                properties['user_message'] += '\n' + line
+
+        self.SYSTEM_MESSAGE_FILE = properties['system_message_file']
+        self.SCRATCH_PAD_FILE = properties['scratchpad_file']
+        self.USER_MESSAGE_FILE = file_path
+        self.user_message = properties['user_message']
 
 
 app_state = AppState()
@@ -174,21 +207,6 @@ def multi_line_input():
     return "\n".join(lines)
 
 
-def get_user_input():
-    return read_file_content(app_state.for_topic_get(app_state.USER_MESSAGE_FILE))
-    # get user input
-    # text = input(f'[{app_state.MODEL_NAME}] USER PROMPT: ')
-    # if 'END' == text:
-    #     print('\n\nExiting...')
-    #     exit(0)
-    # if 'SCRATCHPAD' == text or 'M' == text:
-    #     text = multi_line_input()
-    #     save_content_to_file('scratchpad.md', text.strip('END').strip())
-    #     print('\n\n#####      Scratchpad updated!')
-    #     return None
-    # return text
-
-
 def print_chatbot_response(response, total_tokens, processing_time):
     print('\n\n\n\nCHATBOT response:\n')
     formatted_lines = [textwrap.fill(line, width=120) for line in response.split('\n')]
@@ -197,22 +215,24 @@ def print_chatbot_response(response, total_tokens, processing_time):
     print(f'\n\nINFO: {app_state.MODEL_NAME}: {total_tokens} tokens, {processing_time:.2f} seconds')
 
 
+def read_scratchpad_file(file_path, split_index=None):
+    content = read_file_content(file_path)
+    if split_index is not None:
+        splits = re.split(r'\n\s*sfh-split-file-here\s*\n', content)
+        if split_index < len(splits):
+            return splits[split_index]
+        else:
+            print(f"Error: split_index {split_index} is out of range.")
+            exit(1)
+    else:
+        return content
+
+
 def main():
     # instantiate chatbot
     openai.api_key = read_file_content('key_openai.txt').strip()
 
-    # parse arguments
-    parser = argparse.ArgumentParser(description="Chatbot using OpenAI API")
-    parser.add_argument("--model", default=app_state.MODEL_NAME,
-                        help="Model name (default: %(default)s)")
-    parser.add_argument("--temperature", type=float, default=app_state.MODEL_TEMPERATURE,
-                        help="Temperature (default: %(default)s)")
-    parser.add_argument("--topic", type=str, default=app_state.TOPIC_FOLDER,
-                        help="Topic folder (default: %(default)s)")
-    args, unknown = parser.parse_known_args()
-
-    app_state.MODEL_NAME = args.model
-    app_state.MODEL_TEMPERATURE = args.temperature
+    app_state.read_user_message_file()
 
     print(f"Current settings:\n"
           f"Model: {app_state.MODEL_NAME}\n"
@@ -226,13 +246,11 @@ def main():
           f"Scratchpad: {app_state.SCRATCH_PAD_FILE}")
 
     print(f"\n\nUser message is:"
-          f"\n{read_file_content(app_state.for_topic_get(app_state.USER_MESSAGE_FILE))}"
+          f"\n{read_file_content(app_state.user_message)}"
           f"\n\n")
 
-    text = get_user_input()
-
     # continue with composing conversation and response
-    app_state.ALL_MESSAGES.append({'role': 'user', 'content': text})
+    app_state.ALL_MESSAGES.append({'role': 'user', 'content': app_state.user_message})
     system_message = read_file_content(
         app_state.for_topic_get(app_state.SYSTEM_MESSAGE_FILE),
     ).replace('<<CODE>>', read_file_content(app_state.for_topic_get(app_state.SCRATCH_PAD_FILE)))

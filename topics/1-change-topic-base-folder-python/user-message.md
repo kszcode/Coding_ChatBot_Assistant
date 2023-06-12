@@ -14,7 +14,8 @@ OK, scratch that. I think I have a better idea.
 The user-message.md should be the input file which contains multiple properties:
 1. system message file name (can be absolute or relative)
 2. scratchpad file name (can be absolute or relative)
-3. user message, can be multiline text
-4. log folder name, which by default should be the same folder as the user-message.md file
+3. if scratchpad is too big, then look for sfh-split-file-here and load only the split index specified
+4. the actuall user message, can be multiline text
+5. log folder name, which by default should be the same folder as the user-message.md file
 
 Do, these changes and tell me if there are any other improvements you can think of.

@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QfCQGApqARySHY3FYeN5hD7LGSoX",
+  "object": "chat.completion",
+  "created": 1686589254,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 2467,
+    "completion_tokens": 617,
+    "total_tokens": 3084
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Here's the updated code based on your requirements:\n\n```python\nimport os\nimport re\n\ndef get_file_path(file_path, topic_folder):\n    if os.path.exists(file_path):\n        return file_path\n    else:\n        return os.path.join(topic_folder, file_path)\n\ndef read_user_message_file(file_path):\n    content = read_file_content(file_path)\n    properties = {\n        'system_message_file': '',\n        'scratchpad_file': '',\n        'split_index': None,\n        'user_message': '',\n        'log_folder': os.path.dirname(file_path),\n    }\n\n    for line in content.splitlines():\n        if line.startswith('system_message_file:'):\n            properties['system_message_file'] = line.split(':', 1)[1].strip()\n        elif line.startswith('scratchpad_file:'):\n            properties['scratchpad_file'] = line.split(':', 1)[1].strip()\n        elif line.startswith('split_index:'):\n            properties['split_index'] = int(line.split(':', 1)[1].strip())\n        elif line.startswith('user_message:'):\n            properties['user_message'] = line.split(':', 1)[1].strip()\n        else:\n            properties['user_message'] += '\\n' + line\n\n    return properties\n\ndef read_scratchpad_file(file_path, split_index=None):\n    content = read_file_content(file_path)\n    if split_index is not None:\n        splits = re.split(r'\\n\\s*sfh-split-file-here\\s*\\n', content)\n        if split_index < len(splits):\n            return splits[split_index]\n        else:\n            print(f\"Error: split_index {split_index} is out of range.\")\n            exit(1)\n    else:\n        return content\n\n# Update the main function\ndef main():\n    # ...\n    user_message_file_path = app_state.for_topic_get(app_state.USER_MESSAGE_FILE)\n    user_message_properties = read_user_message_file(user_message_file_path)\n\n    system_message_file_path = get_file_path(user_message_properties['system_message_file'], app_state.TOPIC_FOLDER)\n    scratchpad_file_path = get_file_path(user_message_properties['scratchpad_file'], app_state.TOPIC_FOLDER)\n\n    text = user_message_properties['user_message']\n    app_state.ALL_MESSAGES.append({'role': 'user', 'content': text})\n\n    scratchpad_content = read_scratchpad_file(scratchpad_file_path, user_message_properties['split_index'])\n    system_message = read_file_content(system_message_file_path).replace('<<CODE>>', scratchpad_content)\n\n    # ...\n```\n\nThis code adds the following changes:\n\n1. `get_file_path` function to check if a file exists and return the absolute or relative path.\n2. `read_user_message_file` function to read the user-message.md file and extract the properties.\n3. `read_scratchpad_file` function to read the scratchpad file and return the content or the specified split.\n4. Updated the `main` function to use the new functions and properties from the user-message.md file."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}
