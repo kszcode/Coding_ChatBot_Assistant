@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import re
@@ -233,6 +234,15 @@ def read_scratchpad_file(file_path, split_index=None):
 def main():
     # instantiate chatbot
     openai.api_key = read_file_content('key_openai.txt').strip()
+
+    # Add argument parser
+    parser = argparse.ArgumentParser(description="Chat with the OpenAI API.")
+    parser.add_argument("--user_message_file", type=str, default=f"{app_state.USER_MESSAGE_FILE}",
+                        help="Path to the user-message.md file.")
+    args = parser.parse_args()
+
+    # Update the user message file path in the app state
+    app_state.USER_MESSAGE_FILE = args.user_message_file
 
     app_state.read_user_message_file()
 

@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QfhSdznD8iuV6W4vmimjhKuEk2pl",
+  "object": "chat.completion",
+  "created": 1686591178,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 2341,
+    "completion_tokens": 196,
+    "total_tokens": 2537
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "To use argparse to specify the location of the user-message.md file, you can modify the main function in the script as follows:\n\n```python\ndef main():\n    # Add argument parser\n    parser = argparse.ArgumentParser(description=\"Specify the location of the user-message.md file.\")\n    parser.add_argument(\"--user_message_file\", type=str, default=\"user-message.md\",\n                        help=\"Path to the user-message.md file.\")\n    args = parser.parse_args()\n\n    # Update the user message file path in the app state\n    app_state.USER_MESSAGE_FILE = args.user_message_file\n\n    # Rest of the main function code\n    ...\n```\n\nThis code adds an argument parser that accepts a command-line argument `--user_message_file` to specify the location of the user-message.md file. If the argument is not provided, it will use the default value \"user-message.md\". The app state's `USER_MESSAGE_FILE` attribute is then updated with the provided or default value."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}
