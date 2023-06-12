@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7QhjB0atmoFyrduRBXWdxSvxJu5nd",
+  "object": "chat.completion",
+  "created": 1686598973,
+  "model": "gpt-4-0314",
+  "usage": {
+    "prompt_tokens": 2896,
+    "completion_tokens": 196,
+    "total_tokens": 3092
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Here are the relevant texts that could show the user English text:\n\n1. In the `startCheckout()` function:\n```\n$subscription.text('Unable to create subscription, please try again later.');\n```\n\n2. In the `purchaseSubscription()` function:\n```\noutputLocalizedText('.subscription-create-error', 'checkoutError');\nga('send', 'event', 'Digital Checkout Page', 'errlog:purchaseSubscription', 'Unable to checkout, please verify that your payment details are correct.');\n\noutputLocalizedText('.subscription-create-error', 'subscriptionPurchaseError');\n\noutputLocalizedText('.subscription-create-error', 'prepaidCardError');\n\noutputLocalizedText('.subscription-create-error', 'checkoutErrorWithSupport');\n```\n\nPlease note that some of these texts are used as keys for the `outputLocalizedText()` function, which might already handle the translation. If that's the case, you don't need to translate these keys, but make sure the corresponding translations are available in the localization system."
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}

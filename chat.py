@@ -44,14 +44,8 @@ class AppState:
         self.TOPIC_FOLDER = os.path.dirname(file_path)
 
         content = read_file_content(file_path)
-        properties = {
-            'SYSTEM_MESSAGE_FILE': '',
-            'SCRATCH_PAD_FILE': '',
-            'SCRATCH_PAD_SPLIT_INDEX': None,
-            'user_message': '',
-            'log_folder': os.path.dirname(file_path),
-        }
 
+        properties = {}
         for line in content.splitlines():
             if line.startswith('- `SYSTEM_MESSAGE_FILE`:'):
                 properties['SYSTEM_MESSAGE_FILE'] = line.split(':', 1)[1].strip()
@@ -61,9 +55,17 @@ class AppState:
                 properties['SCRATCH_PAD_SPLIT_INDEX'] = int(line.split(':', 1)[1].strip())
             elif line.startswith('- `SCRATCH_PAD_SPLIT_TEXT`:'):
                 properties['SCRATCH_PAD_SPLIT_TEXT'] = line.split(':', 1)[1].strip()
+            elif line.startswith('- `TOPIC_FOLDER`:'):
+                properties['TOPIC_FOLDER'] = line.split(':', 1)[1].strip()
+            elif line.startswith('- `MODEL_NAME`:'):
+                properties['MODEL_NAME'] = line.split(':', 1)[1].strip()
+            elif line.startswith('- `MODEL_TEMPERATURE`:'):
+                properties['MODEL_TEMPERATURE'] = float(line.split(':', 1)[1].strip())
             elif line.startswith('- `user_message`:'):
                 properties['user_message'] = line.split(':', 1)[1].strip()
             elif line.startswith(' # '):
+                pass  # ignore comments
+            elif line.startswith('[//]: # '):
                 pass  # ignore comments
             else:
                 properties['user_message'] += '\n' + line
@@ -73,6 +75,7 @@ class AppState:
         self.set_property(properties, 'SCRATCH_PAD_SPLIT_INDEX')
         self.set_property(properties, 'SCRATCH_PAD_SPLIT_TEXT')
         self.set_property(properties, 'TOPIC_FOLDER')
+        self.set_property(properties, 'MODEL_NAME')
         self.set_property(properties, 'MODEL_TEMPERATURE')
         self.set_property(properties, 'user_message')
 
